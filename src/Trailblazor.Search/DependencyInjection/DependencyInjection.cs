@@ -23,11 +23,11 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddSearchRequestPipelineOperation<TRequest, TRequestPipeline>(this IServiceCollection services, string operationKey, Action<ISearchRequestOperationConfigurationBuilder<TRequest>> pipelineBuilder)
+    public static IServiceCollection AddSearchRequestPipelineOperation<TRequest, TRequestPipeline>(this IServiceCollection services, string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> pipelineBuilder)
         where TRequest : class, ISearchRequest
         where TRequestPipeline : class, ISearchRequestPipeline<TRequest>
     {
-        var builder = new SearchRequestOperationConfigurationBuilder<TRequest>(operationKey, typeof(TRequestPipeline));
+        var builder = new SearchOperationConfigurationBuilder<TRequest>(operationKey, typeof(TRequestPipeline));
         pipelineBuilder.Invoke(builder);
         var pipelineConfiguration = builder.Build();
 
@@ -39,7 +39,7 @@ public static class DependencyInjection
         return services;
     }
 
-    private static void RegisterPipelineConfiguration(IServiceCollection services, ISearchRequestOperationConfiguration pipelineConfiguration)
+    private static void RegisterPipelineConfiguration(IServiceCollection services, ISearchOperationConfiguration pipelineConfiguration)
     {
         // Add the pipeline as a keyed, transient service.
         services.AddKeyedTransient(pipelineConfiguration.PipelineInterfaceType, pipelineConfiguration.Key, pipelineConfiguration.PipelineImplementationType);

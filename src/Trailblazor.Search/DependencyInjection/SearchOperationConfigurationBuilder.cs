@@ -1,9 +1,9 @@
 ﻿namespace Trailblazor.Search.DependencyInjection;
 
-internal sealed class SearchRequestOperationConfigurationBuilder<TRequest>(string operationKey, Type pipelineImplementationType) : ISearchRequestOperationConfigurationBuilder<TRequest>
+internal sealed class SearchOperationConfigurationBuilder<TRequest>(string operationKey, Type pipelineImplementationType) : ISearchOperationConfigurationBuilder<TRequest>
     where TRequest : class, ISearchRequest
 {
-    private readonly SearchRequestOperationConfiguration _operationConfiguration = new()
+    private readonly SearchOperationConfiguration _operationConfiguration = new()
     {
         Key = operationKey,
         PipelineInterfaceType = typeof(ISearchRequestPipeline<TRequest>),
@@ -11,9 +11,9 @@ internal sealed class SearchRequestOperationConfigurationBuilder<TRequest>(strin
         HandlerInterfaceType = typeof(ISearchRequestHandler<TRequest>),
     };
 
-    public ISearchRequestOperationConfigurationBuilder<TRequest> WithThread(Action<ISearchRequestThreadConfigurationBuilder<TRequest>> threadBuilder)
+    public ISearchOperationConfigurationBuilder<TRequest> WithThread(Action<ISearchOperationThreadConfigurationBuilder<TRequest>> threadBuilder)
     {
-        var builder = new SearchRequestThreadConfigurationBuilder<TRequest>();
+        var builder = new SearchOperationThreadConfigurationBuilder<TRequest>();
         threadBuilder.Invoke(builder);
 
         var threadConfiguration = builder.Build();
@@ -22,7 +22,7 @@ internal sealed class SearchRequestOperationConfigurationBuilder<TRequest>(strin
         return this;
     }
 
-    public ISearchRequestOperationConfiguration Build()
+    public ISearchOperationConfiguration Build()
     {
         return _operationConfiguration;
     }

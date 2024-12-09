@@ -2,6 +2,7 @@
 
 public interface ISearchEngineOptions
 {
-    public IReadOnlyList<ISearchRequestOperationConfiguration> OperationConfigurations { get; }
-    internal void AddPipelineConfigurationAfterRegistration(ISearchRequestOperationConfiguration operationConfiguration);
+    public IReadOnlyList<ISearchOperationConfiguration> OperationConfigurations { get; }
+    public ISearchOperationConfiguration? GetOperationConfigurationByKey(string operationKey);
+    internal void AddPipelineConfigurationAfterRegistration(ISearchOperationConfiguration operationConfiguration);
 }

@@ -1,6 +1,6 @@
 ﻿namespace Trailblazor.Search.DependencyInjection;
 
-public interface ISearchRequestThreadConfiguration
+public interface ISearchOperationThreadConfiguration
 {
     internal List<Type> InternalRequestHandlerTypes { get; set; }
     public int Priority { get; internal set; }
