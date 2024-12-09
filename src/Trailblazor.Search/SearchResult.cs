@@ -2,7 +2,7 @@ namespace Trailblazor.Search;
 
 public abstract class SearchResult : ISearchResult
 {
-    public abstract string Key { get; }
+    public abstract object Key { get; }
 
     public virtual bool Equals(ISearchResult? other)
     {
