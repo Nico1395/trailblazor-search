@@ -97,7 +97,7 @@
 
 @code {
     private ProductSearchRequest _request = new();
-    private IConcurrentSearchRequestCallback? _callback;
+    private IConcurrentSearchOperationCallback? _callback;
     private CancellationTokenSource _cancellationTokenSource = new();
     private EventHandler<SearchResponseChangedEventArgs>? _searchResponseChangedEventHandler;
 

@@ -8,23 +8,21 @@ internal sealed class SystemLogSearchRequestHandler(
     ISystemLogRepository _systemLogRepository,
     ISearchWorker _searchWorker) : ISearchRequestHandler<UniversalSearchRequest>, ISearchRequestHandler<SystemLogSearchRequest>
 {
-    public Task HandleAsync(SearchRequestHandlerContext<UniversalSearchRequest> context, IConcurrentSearchRequestCallback callback, CancellationToken cancellationToken)
+    public Task HandleAsync(SearchRequestHandlerContext<UniversalSearchRequest> context, IConcurrentSearchOperationCallback callback, CancellationToken cancellationToken)
     {
         var requestContext = new SearchRequestHandlerContext<SystemLogSearchRequest>()
         {
-            HandlerId = context.HandlerId,
             Request = SystemLogSearchRequest.Create(context.Request),
+            Metadata = context.Metadata,
         };
 
         return HandleAsync(requestContext, callback, cancellationToken);
     }
 
-    public async Task HandleAsync(SearchRequestHandlerContext<SystemLogSearchRequest> context, IConcurrentSearchRequestCallback callback, CancellationToken cancellationToken)
+    public async Task HandleAsync(SearchRequestHandlerContext<SystemLogSearchRequest> context, IConcurrentSearchOperationCallback callback, CancellationToken cancellationToken)
     {
         try
         {
-            await Task.Delay(999);
-
             var systemLogs = await _systemLogRepository.GetAllAsync(cancellationToken);
             var systemLogsQuery = _searchWorker.SearchItems(systemLogs, new SearchTermSearchWorkerDescriptor()
             {
@@ -37,11 +35,11 @@ internal sealed class SystemLogSearchRequestHandler(
             systemLogsQuery = systemLogsQuery.WhereMatchesCriteria(p => p.Created, context.Request.Created);
 
             var searchedSystemLogs = systemLogsQuery.Select(p => new SystemLogSearchResult(p)).ToList();
-            await callback.ReportResultsAsync(context.HandlerId, searchedSystemLogs);
+            await callback.ReportResultsAsync(context.Metadata, searchedSystemLogs);
         }
         catch (Exception ex)
         {
-            await callback.ReportFailedAsync(context.HandlerId, ex);
+            await callback.ReportFailedAsync(context.Metadata, ex);
         }
     }
 }

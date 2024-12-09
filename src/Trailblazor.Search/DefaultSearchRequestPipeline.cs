@@ -4,48 +4,42 @@ using Trailblazor.Search.Logging;
 
 namespace Trailblazor.Search;
 
-public class DefaultSearchRequestPipeline<TRequest>(
-    IServiceProvider serviceProvider,
-    ISearchEngineOptionsProvider searchEngineOptionsProvider,
-    ICallbackLoggingHandler pipelineLoggingHandler) : ISearchRequestPipeline<TRequest>
+public sealed class DefaultSearchRequestPipeline<TRequest>(
+    IServiceProvider _serviceProvider,
+    ICallbackLoggingHandler _pipelineLoggingHandler) : ISearchRequestPipeline<TRequest>
     where TRequest : class, ISearchRequest
 {
-    protected IServiceProvider ServiceProvider { get; } = serviceProvider;
-    protected ISearchEngineOptionsProvider SearchEngineOptionsProvider { get; } = searchEngineOptionsProvider;
-    protected ICallbackLoggingHandler PipelineLoggingHandler { get; } = pipelineLoggingHandler;
-
-    public Task<IConcurrentSearchRequestCallback> RunPipelineForOperationAsync(string operationKey, TRequest request, CancellationToken cancellationToken)
+    public Task<IConcurrentSearchOperationCallback> RunPipelineForOperationAsync(ISearchOperationConfiguration searchOperationConfiguration, TRequest request, CancellationToken cancellationToken)
     {
-        var operationConfiguration = SearchEngineOptionsProvider.GetOptions().OperationConfigurations.SingleOrDefault(o => o.Key == operationKey) ?? throw new InvalidOperationException($"No search operation with key '{operationKey}' has been registered.");
-        var handlerContextPairings =  ServiceProvider.GetKeyedServices<ISearchRequestHandler<TRequest>>(operationKey).Select(handler => 
+        var handlerContextPairings = _serviceProvider.GetKeyedServices<ISearchRequestHandler<TRequest>>(searchOperationConfiguration.Key).Select(handler => 
         {
             var context = new SearchRequestHandlerContext<TRequest>()
             {
-                HandlerId = Guid.NewGuid(),
                 Request = request,
+                Metadata = new()
+                {
+                    HandlerId = Guid.NewGuid(),
+                    HandlerType = handler.GetType(),
+                }
             };
 
-            return (Context: context, Handler: handler, HandlerType: handler.GetType());
+            return (Context: context, Handler: handler);
         }).ToList();
 
-        var callback = new ConcurrentSearchRequestCallback(
-            handlerContextPairings.Select(p => p.Context.HandlerId).ToList(),
-            PipelineLoggingHandler);
+        var callback = new ConcurrentSearchOperationCallback(
+            handlerContextPairings.Select(p => p.Context.Metadata.HandlerId).ToList(),
+            _pipelineLoggingHandler);
 
-        foreach (var threadConfiguration in operationConfiguration.ThreadConfigurations.OrderBy(t => t.Priority))
+        foreach (var threadConfiguration in searchOperationConfiguration.ThreadConfigurations.OrderBy(t => t.Priority))
         {
-            var pairs = handlerContextPairings
-                .Where(p => threadConfiguration.RequestHandlerTypes.Contains(p.HandlerType))
-                .Select(p => (p.Context, p.Handler))
-                .ToList();
-
+            var pairs = handlerContextPairings.Where(p => threadConfiguration.RequestHandlerTypes.Contains(p.Context.Metadata.HandlerType)).ToList();
             _ = OpenThreadAsync(callback, pairs, cancellationToken);
         }
 
-        return Task.FromResult<IConcurrentSearchRequestCallback>(callback);
+        return Task.FromResult<IConcurrentSearchOperationCallback>(callback);
     }
 
-    private async Task OpenThreadAsync(IConcurrentSearchRequestCallback callback, List<(SearchRequestHandlerContext<TRequest> Context, ISearchRequestHandler<TRequest> Handler)> handlerContextPairings, CancellationToken cancellationToken)
+    private async Task OpenThreadAsync(IConcurrentSearchOperationCallback callback, List<(SearchRequestHandlerContext<TRequest> Context, ISearchRequestHandler<TRequest> Handler)> handlerContextPairings, CancellationToken cancellationToken)
     {
         foreach (var (HandlerContext, Handler) in handlerContextPairings)
             await Handler.HandleAsync(HandlerContext, callback, cancellationToken);

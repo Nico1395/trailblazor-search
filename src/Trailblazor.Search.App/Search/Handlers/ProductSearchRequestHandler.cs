@@ -8,23 +8,21 @@ internal sealed class ProductSearchRequestHandler(
     IProductRepository _productRepository,
     ISearchWorker _searchWorker) : ISearchRequestHandler<UniversalSearchRequest>, ISearchRequestHandler<ProductSearchRequest>
 {
-    public Task HandleAsync(SearchRequestHandlerContext<UniversalSearchRequest> context, IConcurrentSearchRequestCallback callback, CancellationToken cancellationToken)
+    public Task HandleAsync(SearchRequestHandlerContext<UniversalSearchRequest> context, IConcurrentSearchOperationCallback callback, CancellationToken cancellationToken)
     {
         var contextAdapter = new SearchRequestHandlerContext<ProductSearchRequest>()
         {
-            HandlerId = context.HandlerId,
             Request = ProductSearchRequest.Create(context.Request),
+            Metadata = context.Metadata,
         };
 
         return HandleAsync(contextAdapter, callback, cancellationToken);
     }
 
-    public async Task HandleAsync(SearchRequestHandlerContext<ProductSearchRequest> context, IConcurrentSearchRequestCallback callback, CancellationToken cancellationToken)
+    public async Task HandleAsync(SearchRequestHandlerContext<ProductSearchRequest> context, IConcurrentSearchOperationCallback callback, CancellationToken cancellationToken)
     {
         try
         {
-            await Task.Delay(999);
-
             var products = await _productRepository.GetAllAsync(cancellationToken);
             var productsQuery = _searchWorker.SearchItems(products, new SearchTermSearchWorkerDescriptor()
             {
@@ -40,11 +38,11 @@ internal sealed class ProductSearchRequestHandler(
             productsQuery = productsQuery.WhereMatchesCriteria(p => p.LastChanged, context.Request.LastChanged);
 
             var searchedProducts = productsQuery.Select(p => new ProductSearchResult(p)).ToList();
-            await callback.ReportResultsAsync(context.HandlerId, searchedProducts);
+            await callback.ReportResultsAsync(context.Metadata, searchedProducts);
         }
         catch (Exception ex)
         {
-            await callback.ReportFailedAsync(context.HandlerId, ex);
+            await callback.ReportFailedAsync(context.Metadata, ex);
         }
     }
 }

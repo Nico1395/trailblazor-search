@@ -2,7 +2,8 @@ using Trailblazor.Search.Logging;
 
 namespace Trailblazor.Search;
 
-internal sealed class ConcurrentSearchRequestCallback(List<Guid> _handlerIds, ICallbackLoggingHandler _loggingHandler) : IConcurrentSearchRequestCallback
+/// <inheritdoc/>
+public sealed class ConcurrentSearchOperationCallback(List<Guid> _handlerIds, ICallbackLoggingHandler _loggingHandler) : IConcurrentSearchOperationCallback
 {
     private readonly Lock _eventLock = new();
 
@@ -23,54 +24,60 @@ internal sealed class ConcurrentSearchRequestCallback(List<Guid> _handlerIds, IC
         }
     }
 
+    /// <inheritdoc/>
     public void Subscribe(EventHandler<SearchResponseChangedEventArgs> eventHandler)
     {
         OnSearchResponseChanged += eventHandler;
         InvokeOnSearchResultChanged();
     }
 
+    /// <inheritdoc/>
     public void Unsubscribe(EventHandler<SearchResponseChangedEventArgs> eventHandler)
     {
         OnSearchResponseChanged -= eventHandler;
     }
 
+    /// <inheritdoc/>
     public IConcurrentSearchResponse GetCurrentResponse()
     {
         return _response;
     }
 
-    public async Task ReportResultsAsync(Guid handlerId, IEnumerable<ISearchResult> results, bool finished = false)
+    /// <inheritdoc/>
+    public async Task ReportResultsAsync(SearchRequestHandlerMetadata handlerMetadata, IEnumerable<ISearchResult> results, bool finished = false)
     {
         var resultsList = results.ToList();
         _response.AddResults(resultsList);
 
         if (finished)
         {
-            await ReportFinishedAsync(handlerId);
-            _loggingHandler.LogReportResults(handlerId, resultsList);
+            await ReportFinishedAsync(handlerMetadata);
+            _loggingHandler.LogReportResults(handlerMetadata, resultsList);
         }
         else
         {
             InvokeOnSearchResultChanged();
-            _loggingHandler.LogReportResults(handlerId, resultsList);
+            _loggingHandler.LogReportResults(handlerMetadata, resultsList);
         }
     }
 
-    public Task ReportFinishedAsync(Guid handlerId)
+    /// <inheritdoc/>
+    public Task ReportFinishedAsync(SearchRequestHandlerMetadata handlerMetadata)
     {
-        _response.State.SetHandlerState(handlerId, SearchRequestHandlerState.Finished);
+        _response.State.SetHandlerState(handlerMetadata.HandlerId, SearchRequestHandlerState.Finished);
         InvokeOnSearchResultChanged();
 
-        _loggingHandler.LogReportFinished(handlerId);
+        _loggingHandler.LogReportFinished(handlerMetadata);
         return Task.CompletedTask;
     }
-    
-    public Task ReportFailedAsync(Guid handlerId, Exception? exception = null)
+
+    /// <inheritdoc/>
+    public Task ReportFailedAsync(SearchRequestHandlerMetadata handlerMetadata, Exception? exception = null)
     {
-        _response.State.SetHandlerState(handlerId, SearchRequestHandlerState.Failed);
+        _response.State.SetHandlerState(handlerMetadata.HandlerId, SearchRequestHandlerState.Failed);
         InvokeOnSearchResultChanged();
 
-        _loggingHandler.LogReportFailed(handlerId, exception);
+        _loggingHandler.LogReportFailed(handlerMetadata, exception);
         return Task.CompletedTask;
     }
 

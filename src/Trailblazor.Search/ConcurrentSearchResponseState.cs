@@ -1,5 +1,6 @@
 namespace Trailblazor.Search;
 
+/// <inheritdoc/>
 public sealed class ConcurrentSearchResponseState(List<Guid> handlerIds) : IConcurrentSearchResponseState
 {
     private readonly Lock _handlerStatesLock = new();
@@ -7,6 +8,7 @@ public sealed class ConcurrentSearchResponseState(List<Guid> handlerIds) : IConc
         .Select(h => new KeyValuePair<Guid, SearchRequestHandlerState>(h, SearchRequestHandlerState.Pending))
         .ToDictionary();
 
+    /// <inheritdoc/>
     public IReadOnlyDictionary<Guid, SearchRequestHandlerState> HandlerStates
     {
         get
@@ -16,21 +18,31 @@ public sealed class ConcurrentSearchResponseState(List<Guid> handlerIds) : IConc
         }
     }
 
+    /// <inheritdoc/>
     public uint GetFinishedHandlerCount()
     {
         return GetCompletedHandlerCounts().Finished;
     }
 
+    /// <inheritdoc/>
     public uint GetFailedHandlerCount()
     {
         return GetCompletedHandlerCounts().Failed;
     }
 
+    /// <inheritdoc/>
     public uint GetCompletedHandlerCount()
     {
         return GetCompletedHandlerCounts().Total;
     }
 
+    /// <inheritdoc/>
+    public uint GetPendingHandlerCount()
+    {
+        return GetCompletedHandlerCounts().Pending;
+    }
+
+    /// <inheritdoc/>
     public double GetCompletedHandlersPercentage()
     {
         var completedHandlerCount = GetCompletedHandlerCount();
@@ -38,25 +50,28 @@ public sealed class ConcurrentSearchResponseState(List<Guid> handlerIds) : IConc
             return completedHandlerCount / _lockedHandlerStates.Count;
     }
 
+    /// <inheritdoc/>
     public bool IsCompleted()
     {
         return GetCompletedHandlersPercentage() == 1;
     }
 
+    /// <inheritdoc/>
     public void SetHandlerState(Guid handlerId, SearchRequestHandlerState handlerState)
     {
         lock (_handlerStatesLock)
             _lockedHandlerStates[handlerId] = handlerState;
     }
 
-    private (uint Finished, uint Failed, uint Total) GetCompletedHandlerCounts()
+    private (uint Finished, uint Failed, uint Pending, uint Total) GetCompletedHandlerCounts()
     {
         lock (_handlerStatesLock)
         {
-            uint finished = (uint)_lockedHandlerStates.Count(k => k.Value == SearchRequestHandlerState.Finished);
-            uint failed = (uint)_lockedHandlerStates.Count(k => k.Value == SearchRequestHandlerState.Failed);
+            var finished = (uint)_lockedHandlerStates.Count(k => k.Value == SearchRequestHandlerState.Finished);
+            var failed = (uint)_lockedHandlerStates.Count(k => k.Value == SearchRequestHandlerState.Failed);
+            var pending = (uint)_lockedHandlerStates.Count(k => k.Value == SearchRequestHandlerState.Pending);
 
-            return (finished, failed, finished + failed);
+            return (finished, failed, pending, finished + failed);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace Trailblazor.Search.Extensions;
 
