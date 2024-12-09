@@ -1,0 +1,170 @@
+﻿@page "/universal-search"
+
+@using Trailblazor.Search.App.Search
+@using Trailblazor.Search.App.Search.Handlers
+
+@implements IDisposable
+
+<style>
+    .filter {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .result-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+
+    .result {
+        border-radius: 10px;
+        border: 1px solid black;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+</style>
+
+<div style="width:100%; display:flex; flex-direction:column; gap:1rem;">
+    <h1>Search</h1>
+
+    <hr />
+
+    <form @onsubmit="@OnSubmitAsync" style="display:flex; flex-direction:row; align-items:center; justify-content:space-between;">
+        <div style="flex:1; display:flex; flex-direction:row; align-items:center; justify-content:start; gap:1rem; flex-wrap:wrap;">
+            <input placeholder="Search..." @bind-value="@_request.SearchTerm.Value" />
+
+            <div class="filter">
+                <input type="datetime-local" placeholder="Created" @bind-value="@_request.Created.Value" />
+                <InputSelect @bind-Value="_request.Created.Mode">
+                    @foreach (var mode in Enum.GetValues<SearchCriteriaMode>())
+                    {
+                        <option value="@mode">@mode</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="filter">
+                <input type="datetime-local" placeholder="LastChanged" @bind-value="@_request.LastChanged.Value" />
+                <InputSelect @bind-Value="_request.LastChanged.Mode">
+                    @foreach (var mode in Enum.GetValues<SearchCriteriaMode>())
+                    {
+                        <option value="@mode">@mode</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+
+        <div style="flex-grow:0; flex-shrink:0;">
+            <button class="btn-primary" type="submit">
+                Search
+            </button>
+        </div>
+    </form>
+
+    <hr />
+
+    <div style="display:flex; flex-direction:column; gap:2rem;">
+        @if (_searchResults.Count == 0)
+        {
+            <p>No results</p>
+        }
+        else
+        {
+            var productResults = _searchResults.OfType<ProductSearchResult>().ToList();
+            var userResults = _searchResults.OfType<UserSearchResult>().ToList();
+            var systemLogResults = _searchResults.OfType<SystemLogSearchResult>().ToList();
+
+            <p>@($"{_searchResults.Count} results")</p>
+
+            @if (productResults.Count > 0)
+            {
+                <div class="result-group">
+                    <h3>@($"{productResults.Count} Products found")</h3>
+
+                    @foreach (var productResult in productResults)
+                    {
+                        <div class="result">
+                            <h5>@($"{productResult.Product.Name} ({productResult.Product.Id})")</h5>
+                            <div>@productResult.Product.Description</div>
+                            <div>@($"In stock: {productResult.Product.InStock}")</div>
+                            <div>@($"Sold: {productResult.Product.Sold}")</div>
+                            <div>@($"Created: {productResult.Product.Created} - Changed: {productResult.Product.LastChanged}")</div>
+                        </div>
+                    }
+                </div>
+            }
+
+            if (userResults.Count > 0)
+            {
+                <div class="result-group">
+                    <h3>@($"{userResults.Count} Users found")</h3>
+
+                    @foreach (var userResult in userResults)
+                    {
+                        <div class="result">
+                            <h5>@($"{userResult.User.FirstName} ({userResult.User.LastName})")</h5>
+                            <div>@($"Created: {userResult.User.Created} - Changed: {userResult.User.LastChanged}")</div>
+                        </div>
+                    }
+                </div>
+            }
+
+            if (systemLogResults.Count > 0)
+            {
+                <div class="result-group">
+                    <h3>@($"{systemLogResults.Count} System Logs found")</h3>
+
+                    @foreach (var systemLogResult in systemLogResults)
+                    {
+                        <div class="result">
+                            <h5>@systemLogResult.SystemLog.Id</h5>
+                            <div>@systemLogResult.SystemLog.Message</div>
+                            <div>@($"Created: {systemLogResult.SystemLog.Created}")</div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private UniversalSearchRequest _request = new();
+    private IConcurrentSearchRequestCallback? _callback;
+    private CancellationTokenSource _cancellationTokenSource = new();
+    private EventHandler<SearchResponseChangedEventArgs>? _searchResponseChangedEventHandler;
+
+    private List<ISearchResult> _searchResults = new();
+    private bool _stillSearching;
+
+    [Inject]
+    private ISearchEngine SearchEngine { get; set; } = null!;
+
+    public void Dispose()
+    {
+        if (_callback != null && _searchResponseChangedEventHandler != null)
+            _callback.Unsubscribe(_searchResponseChangedEventHandler);
+    }
+
+    private async Task OnSubmitAsync(EventArgs args)
+    {
+        _callback = await SearchEngine.SendRequestAsync("universal-search", _request, _cancellationTokenSource.Token);
+
+        _searchResponseChangedEventHandler = async (_, args) => await OnSearchResponseChanged(args);
+        _callback.Subscribe(_searchResponseChangedEventHandler);
+    }
+
+    private Task OnSearchResponseChanged(SearchResponseChangedEventArgs args)
+    {
+        return InvokeAsync(() =>
+        {
+            _searchResults = args.Response.Results.ToList();
+            _stillSearching = !args.Progress.IsCompleted();
+
+            StateHasChanged();
+        });
+    }
+}

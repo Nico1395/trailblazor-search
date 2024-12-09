@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{CA0F0264-6F21-45
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trailblazor.Search.App", "Trailblazor.Search.App\Trailblazor.Search.App.csproj", "{F1BEE1FB-7BE0-46EC-9020-DA2B4D2D8100}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{6D96A5D4-94B5-4082-91AA-482F0D92E61F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D96A5D4-94B5-4082-91AA-482F0D92E61F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D96A5D4-94B5-4082-91AA-482F0D92E61F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1BEE1FB-7BE0-46EC-9020-DA2B4D2D8100}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1BEE1FB-7BE0-46EC-9020-DA2B4D2D8100}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1BEE1FB-7BE0-46EC-9020-DA2B4D2D8100}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1BEE1FB-7BE0-46EC-9020-DA2B4D2D8100}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
