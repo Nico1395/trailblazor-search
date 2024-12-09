@@ -126,7 +126,7 @@
         return InvokeAsync(() => 
         {
             _searchResults = args.Response.Results.ToList();
-            _stillSearching = !args.Progress.IsCompleted();
+            _stillSearching = !args.Response.State.IsCompleted();
 
             StateHasChanged();
         });
