@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 
-namespace Trailblazor.Search.Criteria.Workers;
+namespace Trailblazor.Search.Criterias.Workers;
 
 internal sealed class StringSearchCriteriaWorker : IStringSearchCriteriaWorker
 {

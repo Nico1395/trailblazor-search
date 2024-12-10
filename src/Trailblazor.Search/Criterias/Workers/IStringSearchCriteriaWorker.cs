@@ -1,4 +1,4 @@
-﻿namespace Trailblazor.Search.Criteria.Workers;
+﻿namespace Trailblazor.Search.Criterias.Workers;
 
 /// <summary>
 /// Service handles filtering items with a given <see cref="StringSearchCriteria"/>.

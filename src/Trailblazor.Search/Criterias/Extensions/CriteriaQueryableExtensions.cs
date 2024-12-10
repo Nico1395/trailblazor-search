@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Trailblazor.Search.Criteria.Extensions;
+namespace Trailblazor.Search.Criterias.Extensions;
 
 /// <summary>
 /// Extensions for the <see cref="IQueryable{T}"/> interface to be able to handle search criterias automatically.
