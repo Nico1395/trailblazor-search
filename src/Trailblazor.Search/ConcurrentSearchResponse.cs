@@ -1,10 +1,12 @@
 namespace Trailblazor.Search;
 
+/// <inheritdoc/>
 public sealed class ConcurrentSearchResponse(List<Guid> handlerIds) : IConcurrentSearchResponse
 {
     private readonly Lock _lock = new();
     private readonly List<ISearchResult> _results = [];
 
+    /// <inheritdoc/>
     public IReadOnlyList<ISearchResult> Results
     {
         get
@@ -14,6 +16,7 @@ public sealed class ConcurrentSearchResponse(List<Guid> handlerIds) : IConcurren
         }
     }
 
+    /// <inheritdoc/>
     public IConcurrentSearchResponseState State { get; } = new ConcurrentSearchResponseState(handlerIds);
 
     internal void AddResults(IReadOnlyList<ISearchResult> results)

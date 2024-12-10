@@ -4,6 +4,7 @@ using Trailblazor.Search.Logging;
 
 namespace Trailblazor.Search;
 
+/// <inheritdoc/>
 public sealed class DefaultSearchRequestPipeline<TRequest>(
     IServiceProvider _serviceProvider,
     ICallbackLoggingHandler _pipelineLoggingHandler) : ISearchRequestPipeline<TRequest>
@@ -13,6 +14,7 @@ public sealed class DefaultSearchRequestPipeline<TRequest>(
         ISearchRequestHandler<TRequest> Handler,
         SearchRequestHandlerContext<TRequest> Context);
 
+    /// <inheritdoc/>
     public Task<IConcurrentSearchOperationCallback> RunPipelineForOperationAsync(ISearchOperationConfiguration searchOperationConfiguration, TRequest request, CancellationToken cancellationToken)
     {
         var handlerContextPairings = AggregateHandlerContexts(searchOperationConfiguration, request);

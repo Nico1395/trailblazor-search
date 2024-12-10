@@ -45,4 +45,6 @@ public static class CriteriaEnumerableExtensions
         var lambda = Expression.Lambda<Func<T, bool>>(comparison, propertySelector.Parameters[0]);
         return queryable.Where(lambda);
     }
+
+    // TODO -> An extension for every criteria
 }
