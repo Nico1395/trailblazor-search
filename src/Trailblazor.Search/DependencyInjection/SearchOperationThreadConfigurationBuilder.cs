@@ -1,9 +1,12 @@
 ﻿namespace Trailblazor.Search.DependencyInjection;
 
-internal sealed class SearchOperationThreadConfigurationBuilder<TRequest> : ISearchOperationThreadConfigurationBuilder<TRequest>
+internal sealed class SearchOperationThreadConfigurationBuilder<TRequest>(string threadKey) : ISearchOperationThreadConfigurationBuilder<TRequest>
     where TRequest : class, ISearchRequest
 {
-    private readonly SearchOperationThreadConfiguration _threadConfiguration = new();
+    private readonly SearchOperationThreadConfiguration _threadConfiguration = new()
+    {
+        Key = threadKey,
+    };
 
     public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler<TRequestHandler>(int priority = 0)
         where TRequestHandler : class, ISearchRequestHandler<TRequest>

@@ -1,14 +1,16 @@
+using Trailblazor.Search.DependencyInjection;
 using Trailblazor.Search.Logging;
 
 namespace Trailblazor.Search;
 
 /// <inheritdoc/>
-public sealed class ConcurrentSearchOperationCallback(List<Guid> _handlerIds, ICallbackLoggingHandler _loggingHandler) : IConcurrentSearchOperationCallback
+public sealed class ConcurrentSearchOperationCallback(ICallbackLoggingHandler _loggingHandler) : IConcurrentSearchOperationCallback
 {
+    private ISearchRequest? _searchRequest;
+    private ConcurrentSearchResponse _response = new([]);
+    private ISearchOperationConfiguration? _operationConfiguration;
+
     private readonly Lock _eventLock = new();
-
-    private readonly ConcurrentSearchResponse _response = new(_handlerIds);
-
     private EventHandler<SearchResponseChangedEventArgs>? _onSearchResponseChanged;
     private event EventHandler<SearchResponseChangedEventArgs> OnSearchResponseChanged
     {
@@ -22,6 +24,18 @@ public sealed class ConcurrentSearchOperationCallback(List<Guid> _handlerIds, IC
             lock (_eventLock)
                 _onSearchResponseChanged -= value;
         }
+    }
+
+    /// <inheritdoc/>
+    public void Connect(ISearchOperationConfiguration operationConfiguration, ISearchRequest searchRequest)
+    {
+        _operationConfiguration = operationConfiguration;
+        _searchRequest = searchRequest;
+
+        var handlerIds = _operationConfiguration.ThreadConfigurations.SelectMany(t => t.HandlerConfigurations).Select(h => h.HandlerId).ToList();
+        _response = new ConcurrentSearchResponse(handlerIds);
+
+        InvokeOnSearchResultChanged();
     }
 
     /// <inheritdoc/>

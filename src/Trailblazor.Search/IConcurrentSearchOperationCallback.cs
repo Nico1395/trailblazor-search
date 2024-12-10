@@ -1,3 +1,5 @@
+using Trailblazor.Search.DependencyInjection;
+
 namespace Trailblazor.Search;
 
 /// <summary>
@@ -8,6 +10,13 @@ namespace Trailblazor.Search;
 /// </remarks>
 public interface IConcurrentSearchOperationCallback
 {
+    /// <summary>
+    /// Allows a pipeline to initialize the callback.
+    /// </summary>
+    /// <param name="operationConfiguration">Configuration of the search operation.</param>
+    /// <param name="searchRequest">Most current search request for the operation.</param>
+    public void Connect(ISearchOperationConfiguration operationConfiguration, ISearchRequest searchRequest);
+
     /// <summary>
     /// Subscribes to when the <see cref="IConcurrentSearchResponse"/> changes.
     /// </summary>

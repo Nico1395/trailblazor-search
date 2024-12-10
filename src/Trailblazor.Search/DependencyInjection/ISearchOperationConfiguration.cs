@@ -8,22 +8,27 @@ public interface ISearchOperationConfiguration
     /// <summary>
     /// Key of the operation.
     /// </summary>
-    public string Key { get; init; }
+    public string Key { get; }
 
     /// <summary>
     /// Interface type of the orchestrating pipeline.
     /// </summary>
-    public Type PipelineInterfaceType { get; init; }
+    public Type PipelineInterfaceType { get; }
 
     /// <summary>
     /// Implementation type of the orchestrating pipeline.
     /// </summary>
-    public Type PipelineImplementationType { get; init; }
+    public Type PipelineImplementationType { get; }
 
     /// <summary>
     /// Interface type of request handlers.
     /// </summary>
-    public Type HandlerInterfaceType { get; init; }
+    public Type HandlerInterfaceType { get; }
+
+    /// <summary>
+    /// Implementation type of the operation callback.
+    /// </summary>
+    public Type? CallbackImplementationType { get; }
 
     /// <summary>
     /// Thread configurations added to the operation.

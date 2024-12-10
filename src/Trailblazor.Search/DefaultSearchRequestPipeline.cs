@@ -1,13 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Trailblazor.Search.DependencyInjection;
-using Trailblazor.Search.Logging;
 
 namespace Trailblazor.Search;
 
 /// <inheritdoc/>
-public sealed class DefaultSearchRequestPipeline<TRequest>(
-    IServiceProvider _serviceProvider,
-    ICallbackLoggingHandler _pipelineLoggingHandler) : ISearchRequestPipeline<TRequest>
+public sealed class DefaultSearchRequestPipeline<TRequest>(IServiceProvider _serviceProvider) : ISearchRequestPipeline<TRequest>
     where TRequest : class, ISearchRequest
 {
     private sealed record HandlerContextPair(
@@ -17,12 +14,12 @@ public sealed class DefaultSearchRequestPipeline<TRequest>(
     /// <inheritdoc/>
     public Task<IConcurrentSearchOperationCallback> RunPipelineForOperationAsync(ISearchOperationConfiguration searchOperationConfiguration, TRequest request, CancellationToken cancellationToken)
     {
-        var handlerContextPairings = AggregateHandlerContexts(searchOperationConfiguration, request);
-        var callback = new ConcurrentSearchOperationCallback(handlerContextPairings.Select(p => p.Context.HandlerConfiguration.HandlerId).ToList(), _pipelineLoggingHandler);
+        var callback = _serviceProvider.GetRequiredKeyedService<IConcurrentSearchOperationCallback>(searchOperationConfiguration.Key);
+        callback.Connect(searchOperationConfiguration, request);
 
         OpenThreads(
             searchOperationConfiguration,
-            handlerContextPairings,
+            AggregateHandlerContexts(searchOperationConfiguration, request),
             callback,
             cancellationToken);
 

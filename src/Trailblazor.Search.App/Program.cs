@@ -25,20 +25,20 @@ public class Program
         {
             options.AddOperation<UniversalSearchRequest>("universal-search", p =>
             {
-                p.WithThread(t =>
+                p.WithThread("th-a", t =>
                 {
                     t.WithHandler<UserSearchRequestHandler>();
                     t.WithHandler<ProductSearchRequestHandler>(1);
                 });
-                p.WithThread(t =>
+                p.WithThread("th-b", t =>
                 {
                     t.WithHandler<SystemLogSearchRequestHandler>();
                 });
             });
 
-            options.AddOperation<ProductSearchRequest, DefaultSearchRequestPipeline<ProductSearchRequest>>("products-search", p =>
+            options.AddOperation<ProductSearchRequest>("products-search", p =>
             {
-                p.WithThread(t => t.WithHandler<ProductSearchRequestHandler>());
+                p.WithThread("th-a", t => t.WithHandler<ProductSearchRequestHandler>());
             });
         });
 

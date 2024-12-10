@@ -36,31 +36,14 @@ public static class DependencyInjection
     /// Adds a search request to the <paramref name="services"/>.
     /// </summary>
     /// <typeparam name="TRequest">Type of request to be handled by the operation.</typeparam>
-    /// <typeparam name="TRequestPipeline">Type of pipeline orchestrating the operation.</typeparam>
     /// <param name="services"><see cref="IServiceCollection"/> the services are to be registered to.</param>
     /// <param name="operationKey">Key of the operation.</param>
     /// <param name="operationBuilder">Builder action for configuring the operation.</param>
     /// <returns>The <paramref name="services"/> for further configurations.</returns>
-    public static IServiceCollection AddSearchRequestOperation<TRequest, TRequestPipeline>(this IServiceCollection services, string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> operationBuilder)
-        where TRequest : class, ISearchRequest
-        where TRequestPipeline : class, ISearchRequestPipeline<TRequest>
-    {
-        return services.AddSearchRequestOperation(typeof(TRequestPipeline), operationKey, operationBuilder);
-    }
-
-    /// <summary>
-    /// Adds a search request to the <paramref name="services"/>.
-    /// </summary>
-    /// <typeparam name="TRequest">Type of request to be handled by the operation.</typeparam>
-    /// <param name="services"><see cref="IServiceCollection"/> the services are to be registered to.</param>
-    /// <param name="pipelineImplemenetationType">Type of pipeline orchestrating the operation.</param>
-    /// <param name="operationKey">Key of the operation.</param>
-    /// <param name="operationBuilder">Builder action for configuring the operation.</param>
-    /// <returns>The <paramref name="services"/> for further configurations.</returns>
-    public static IServiceCollection AddSearchRequestOperation<TRequest>(this IServiceCollection services, Type pipelineImplemenetationType, string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> operationBuilder)
+    public static IServiceCollection AddSearchRequestOperation<TRequest>(this IServiceCollection services, string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> operationBuilder)
         where TRequest : class, ISearchRequest
     {
-        var builder = new SearchOperationConfigurationBuilder<TRequest>(operationKey, pipelineImplemenetationType);
+        var builder = new SearchOperationConfigurationBuilder<TRequest>(operationKey);
         operationBuilder.Invoke(builder);
         var operationConfiguration = builder.Build();
 
@@ -74,10 +57,9 @@ public static class DependencyInjection
 
     private static void RegisterPipelineConfiguration(IServiceCollection services, ISearchOperationConfiguration operationConfiguration)
     {
-        // Add the pipeline as a keyed, transient service.
         services.AddKeyedTransient(operationConfiguration.PipelineInterfaceType, operationConfiguration.Key, operationConfiguration.PipelineImplementationType);
+        services.AddKeyedScoped(typeof(IConcurrentSearchOperationCallback), operationConfiguration.Key, operationConfiguration.CallbackImplementationType ?? typeof(ConcurrentSearchOperationCallback));
 
-        // All its handlers are also to be registered as keyed transient services.
         foreach (var handlerConfiguration in operationConfiguration.ThreadConfigurations.SelectMany(t => t.HandlerConfigurations))
             services.AddKeyedTransient(operationConfiguration.HandlerInterfaceType, operationConfiguration.Key, handlerConfiguration.HandlerType);
     }

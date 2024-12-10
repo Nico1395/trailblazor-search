@@ -7,20 +7,7 @@ internal sealed class SearchEngineOptionsBuilder : ISearchEngineOptionsBuilder
     public ISearchEngineOptionsBuilder AddOperation<TRequest>(string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> operationBuilder)
         where TRequest : class, ISearchRequest
     {
-        return AddOperation(typeof(DefaultSearchRequestPipeline<TRequest>), operationKey, operationBuilder);
-    }
-
-    public ISearchEngineOptionsBuilder AddOperation<TRequest, TPipeline>(string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> operationBuilder)
-        where TRequest : class, ISearchRequest
-        where TPipeline : class, ISearchRequestPipeline<TRequest>
-    {
-        return AddOperation(typeof(TPipeline), operationKey, operationBuilder);
-    }
-
-    public ISearchEngineOptionsBuilder AddOperation<TRequest>(Type pipelineImplementationType, string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> operationBuilder)
-        where TRequest : class, ISearchRequest
-    {
-        var builder = new SearchOperationConfigurationBuilder<TRequest>(operationKey, pipelineImplementationType);
+        var builder = new SearchOperationConfigurationBuilder<TRequest>(operationKey);
         operationBuilder.Invoke(builder);
 
         var operationConfiguration = builder.Build();
