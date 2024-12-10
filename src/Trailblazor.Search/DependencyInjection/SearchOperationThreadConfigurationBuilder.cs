@@ -5,23 +5,21 @@ internal sealed class SearchOperationThreadConfigurationBuilder<TRequest> : ISea
 {
     private readonly SearchOperationThreadConfiguration _threadConfiguration = new();
 
-    public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler<TRequestHandler>()
+    public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler<TRequestHandler>(int priority = 0)
         where TRequestHandler : class, ISearchRequestHandler<TRequest>
     {
-        return WithHandler(typeof(TRequestHandler));
+        return WithHandler(typeof(TRequestHandler), priority);
     }
 
-    public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler(Type requestHandlerType)
+    public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler(Type requestHandlerType, int priority = 0)
     {
-        if (!_threadConfiguration.InternalRequestHandlerTypes.Contains(requestHandlerType))
-            _threadConfiguration.InternalRequestHandlerTypes.Add(requestHandlerType);
+        var handlerConfiguration = new SearchRequestHandlerConfiguration()
+        {
+            HandlerType = requestHandlerType,
+            Priority = priority,
+        };
+        _threadConfiguration.InternalHandlerConfigurations.Add(handlerConfiguration);
 
-        return this;
-    }
-
-    public ISearchOperationThreadConfigurationBuilder<TRequest> WithPriority(int priority)
-    {
-        _threadConfiguration.Priority = priority;
         return this;
     }
 

@@ -3,9 +3,8 @@
 public interface ISearchOperationThreadConfigurationBuilder<TRequest>
     where TRequest : class, ISearchRequest
 {
-    public ISearchOperationThreadConfigurationBuilder<TRequest> WithPriority(int priority);
-    public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler<TRequestHandler>()
+    public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler<TRequestHandler>(int priority = 0)
         where TRequestHandler : class, ISearchRequestHandler<TRequest>;
-    public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler(Type requestHandlerType);
+    public ISearchOperationThreadConfigurationBuilder<TRequest> WithHandler(Type requestHandlerType, int priority = 0);
     internal ISearchOperationThreadConfiguration Build();
 }

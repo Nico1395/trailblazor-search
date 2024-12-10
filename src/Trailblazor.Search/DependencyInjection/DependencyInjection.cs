@@ -29,23 +29,23 @@ public static class DependencyInjection
     {
         var builder = new SearchOperationConfigurationBuilder<TRequest>(operationKey, typeof(TRequestPipeline));
         pipelineBuilder.Invoke(builder);
-        var pipelineConfiguration = builder.Build();
+        var operationConfiguration = builder.Build();
 
-        RegisterPipelineConfiguration(services, pipelineConfiguration);
+        RegisterPipelineConfiguration(services, operationConfiguration);
 
         var searchEngineOptions = services.BuildServiceProvider().GetRequiredService<ISearchEngineOptionsProvider>().GetOptions();
-        searchEngineOptions.AddPipelineConfigurationAfterRegistration(pipelineConfiguration);
+        searchEngineOptions.AddPipelineConfigurationAfterRegistration(operationConfiguration);
 
         return services;
     }
 
-    private static void RegisterPipelineConfiguration(IServiceCollection services, ISearchOperationConfiguration pipelineConfiguration)
+    private static void RegisterPipelineConfiguration(IServiceCollection services, ISearchOperationConfiguration operationConfiguration)
     {
         // Add the pipeline as a keyed, transient service.
-        services.AddKeyedTransient(pipelineConfiguration.PipelineInterfaceType, pipelineConfiguration.Key, pipelineConfiguration.PipelineImplementationType);
+        services.AddKeyedTransient(operationConfiguration.PipelineInterfaceType, operationConfiguration.Key, operationConfiguration.PipelineImplementationType);
 
         // All its handlers are also to be registered as keyed transient services.
-        foreach (var requestHandlerType in pipelineConfiguration.ThreadConfigurations.SelectMany(t => t.RequestHandlerTypes))
-            services.AddKeyedTransient(pipelineConfiguration.HandlerInterfaceType, pipelineConfiguration.Key, requestHandlerType);
+        foreach (var handlerConfiguration in operationConfiguration.ThreadConfigurations.SelectMany(t => t.HandlerConfigurations))
+            services.AddKeyedTransient(operationConfiguration.HandlerInterfaceType, operationConfiguration.Key, handlerConfiguration.HandlerType);
     }
 }

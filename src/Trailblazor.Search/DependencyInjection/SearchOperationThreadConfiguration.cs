@@ -2,7 +2,6 @@
 
 internal sealed class SearchOperationThreadConfiguration : ISearchOperationThreadConfiguration
 {
-    public List<Type> InternalRequestHandlerTypes { get; set; } = [];
-    public int Priority { get; set; }
-    public IReadOnlyList<Type> RequestHandlerTypes => InternalRequestHandlerTypes;
+    public List<SearchRequestHandlerConfiguration> InternalHandlerConfigurations { get; } = [];
+    public IReadOnlyList<ISearchRequestHandlerConfiguration> HandlerConfigurations => InternalHandlerConfigurations;
 }
