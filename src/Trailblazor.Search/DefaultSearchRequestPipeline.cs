@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Trailblazor.Search.DependencyInjection;
 using Trailblazor.Search.Logging;
+using Trailblazor.Search.Requests;
 
 namespace Trailblazor.Search;
 

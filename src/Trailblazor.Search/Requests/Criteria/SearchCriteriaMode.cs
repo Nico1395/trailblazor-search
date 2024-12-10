@@ -1,4 +1,4 @@
-﻿namespace Trailblazor.Search;
+﻿namespace Trailblazor.Search.Requests.Criteria;
 
 /// <summary>
 /// Mode of a comparable <see cref="SearchCriteria{T}"/>.

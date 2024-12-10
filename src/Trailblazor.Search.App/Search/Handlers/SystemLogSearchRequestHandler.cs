@@ -1,5 +1,6 @@
 ﻿using Trailblazor.Search.App.Persistence;
-using Trailblazor.Search.Extensions;
+using Trailblazor.Search.Requests;
+using Trailblazor.Search.Requests.Criteria.Extensions;
 using Trailblazor.Search.Workers;
 
 namespace Trailblazor.Search.App.Search.Handlers;

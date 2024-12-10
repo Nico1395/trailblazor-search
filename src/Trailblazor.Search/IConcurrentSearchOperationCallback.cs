@@ -1,3 +1,5 @@
+using Trailblazor.Search.Requests;
+
 namespace Trailblazor.Search;
 
 /// <summary>

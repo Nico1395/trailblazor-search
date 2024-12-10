@@ -1,4 +1,7 @@
-﻿namespace Trailblazor.Search.App.Search;
+﻿using Trailblazor.Search.Requests;
+using Trailblazor.Search.Requests.Criteria;
+
+namespace Trailblazor.Search.App.Search;
 
 internal sealed record UserSearchRequest : ISearchRequest
 {

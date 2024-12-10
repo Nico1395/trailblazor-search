@@ -1,4 +1,6 @@
-﻿namespace Trailblazor.Search.DependencyInjection;
+﻿using Trailblazor.Search.Requests;
+
+namespace Trailblazor.Search.DependencyInjection;
 
 internal sealed class SearchEngineOptionsBuilder : ISearchEngineOptionsBuilder
 {

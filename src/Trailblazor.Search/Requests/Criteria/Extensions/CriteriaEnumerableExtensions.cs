@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Trailblazor.Search.Extensions;
+namespace Trailblazor.Search.Requests.Criteria.Extensions;
 
 public static class CriteriaEnumerableExtensions
 {
@@ -33,7 +33,7 @@ public static class CriteriaEnumerableExtensions
 
         var property = propertySelector.Body;
         var criteriaValueConstant = Expression.Constant(criteria.CaseSensitive ? criteria.Value : criteria.Value.ToLowerInvariant(), typeof(string));
-            
+
         if (!criteria.CaseSensitive)
             property = Expression.Call(property, typeof(string).GetMethod("ToLower", Type.EmptyTypes) ?? throw new InvalidProgramException());
 

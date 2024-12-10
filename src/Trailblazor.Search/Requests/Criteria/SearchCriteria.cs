@@ -1,4 +1,4 @@
-﻿namespace Trailblazor.Search;
+﻿namespace Trailblazor.Search.Requests.Criteria;
 
 /// <summary>
 /// Search criteria of a <see cref="ISearchRequest"/> with a <see cref="SearchCriteriaMode"/> for <see cref="IComparable{T}"/> types.

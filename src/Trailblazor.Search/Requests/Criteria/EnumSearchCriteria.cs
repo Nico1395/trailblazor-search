@@ -1,4 +1,4 @@
-﻿namespace Trailblazor.Search;
+﻿namespace Trailblazor.Search.Requests.Criteria;
 
 public record EnumSearchCriteria<TEnum>
     where TEnum : Enum
