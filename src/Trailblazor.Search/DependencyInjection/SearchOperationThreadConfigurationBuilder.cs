@@ -1,6 +1,4 @@
-﻿using Trailblazor.Search.Requests;
-
-namespace Trailblazor.Search.DependencyInjection;
+﻿namespace Trailblazor.Search.DependencyInjection;
 
 internal sealed class SearchOperationThreadConfigurationBuilder<TRequest> : ISearchOperationThreadConfigurationBuilder<TRequest>
     where TRequest : class, ISearchRequest

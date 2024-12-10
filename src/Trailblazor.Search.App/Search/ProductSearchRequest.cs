@@ -1,5 +1,4 @@
-﻿using Trailblazor.Search.Requests;
-using Trailblazor.Search.Requests.Criteria;
+﻿using Trailblazor.Search.Criteria;
 
 namespace Trailblazor.Search.App.Search;
 

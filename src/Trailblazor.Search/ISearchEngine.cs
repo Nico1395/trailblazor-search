@@ -1,6 +1,4 @@
-﻿using Trailblazor.Search.Requests;
-
-namespace Trailblazor.Search;
+﻿namespace Trailblazor.Search;
 
 /// <summary>
 /// Service sends <see cref="ISearchRequest"/> into <see cref="ISearchRequestPipeline{TRequest}"/>.

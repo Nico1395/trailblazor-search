@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
+using Trailblazor.Search.Criteria;
 
-namespace Trailblazor.Search.Requests.Criteria.Extensions;
+namespace Trailblazor.Search.Criteria.Extensions;
 
 public static class CriteriaEnumerableExtensions
 {

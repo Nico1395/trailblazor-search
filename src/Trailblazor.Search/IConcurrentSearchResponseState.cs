@@ -1,6 +1,4 @@
-﻿using Trailblazor.Search.Requests;
-
-namespace Trailblazor.Search;
+﻿namespace Trailblazor.Search;
 
 /// <summary>
 /// State of an <see cref="IConcurrentSearchResponse"/>. Contains information about the progresses of an operation.

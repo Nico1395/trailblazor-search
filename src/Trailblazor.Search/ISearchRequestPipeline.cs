@@ -1,5 +1,4 @@
 using Trailblazor.Search.DependencyInjection;
-using Trailblazor.Search.Requests;
 
 namespace Trailblazor.Search;
 

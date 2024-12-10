@@ -1,6 +1,6 @@
 using Trailblazor.Search.DependencyInjection;
 
-namespace Trailblazor.Search.Requests;
+namespace Trailblazor.Search;
 
 /// <summary>
 /// Handler that can be invoked in a <see cref="ISearchOperationConfiguration"/>

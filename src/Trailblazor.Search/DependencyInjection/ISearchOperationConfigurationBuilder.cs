@@ -1,6 +1,4 @@
-﻿using Trailblazor.Search.Requests;
-
-namespace Trailblazor.Search.DependencyInjection;
+﻿namespace Trailblazor.Search.DependencyInjection;
 
 public interface ISearchOperationConfigurationBuilder<TRequest>
     where TRequest : class, ISearchRequest

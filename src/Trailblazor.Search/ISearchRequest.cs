@@ -1,4 +1,4 @@
-namespace Trailblazor.Search.Requests;
+namespace Trailblazor.Search;
 
 /// <summary>
 /// Request of a search operation.
