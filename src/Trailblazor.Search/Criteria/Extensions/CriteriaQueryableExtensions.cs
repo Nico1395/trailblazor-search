@@ -1,9 +1,11 @@
 ﻿using System.Linq.Expressions;
-using Trailblazor.Search.Criteria;
 
 namespace Trailblazor.Search.Criteria.Extensions;
 
-public static class CriteriaEnumerableExtensions
+/// <summary>
+/// Extensions for the <see cref="IQueryable{T}"/> interface to be able to handle search criterias automatically.
+/// </summary>
+public static class CriteriaQueryableExtensions
 {
     public static IQueryable<T> WhereMatchesCriteria<T, TValue>(this IQueryable<T> queryable, Expression<Func<T, TValue>> propertySelector, SearchCriteria<TValue> criteria)
         where TValue : struct, IComparable<TValue>
