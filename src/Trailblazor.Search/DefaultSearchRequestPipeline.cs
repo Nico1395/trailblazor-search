@@ -23,7 +23,7 @@ public sealed class DefaultSearchRequestPipeline<TRequest>(IServiceProvider _ser
             callback,
             cancellationToken);
 
-        return Task.FromResult<IConcurrentSearchOperationCallback>(callback);
+        return Task.FromResult(callback);
     }
 
     private List<HandlerContextPair> AggregateHandlerContexts(ISearchOperationConfiguration searchOperationConfiguration, TRequest request)

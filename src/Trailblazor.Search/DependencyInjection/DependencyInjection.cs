@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Trailblazor.Search.Criteria.Workers;
+using Trailblazor.Search.Criterias.Workers;
 using Trailblazor.Search.Logging;
 
 namespace Trailblazor.Search.DependencyInjection;
