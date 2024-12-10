@@ -21,7 +21,7 @@ public class Program
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<ISystemLogRepository, SystemLogRepository>();
 
-        builder.Services.AddTrailblazorSearchClient(options =>
+        builder.Services.AddTrailblazorSearch(options =>
         {
             options.AddOperation<UniversalSearchRequest>("universal-search", p =>
             {

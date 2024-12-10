@@ -4,9 +4,18 @@ using Trailblazor.Search.Workers;
 
 namespace Trailblazor.Search.DependencyInjection;
 
+/// <summary>
+/// Static class contains extensions for setting up dependency injection.
+/// </summary>
 public static class DependencyInjection
 {
-    public static IServiceCollection AddTrailblazorSearchClient(this IServiceCollection services, Action<ISearchEngineOptionsBuilder>? options = null)
+    /// <summary>
+    /// Adds the Trailblazor search services to the <paramref name="services"/>.
+    /// </summary>
+    /// <param name="services"><see cref="IServiceCollection"/> the services are to be registered to.</param>
+    /// <param name="options">Builder action for configuring the search engines <see cref="ISearchEngineOptions"/>.</param>
+    /// <returns>The <paramref name="services"/> for further configurations.</returns>
+    public static IServiceCollection AddTrailblazorSearch(this IServiceCollection services, Action<ISearchEngineOptionsBuilder>? options = null)
     {
         var builder = new SearchEngineOptionsBuilder();
         options?.Invoke(builder);
@@ -23,12 +32,36 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddSearchRequestPipelineOperation<TRequest, TRequestPipeline>(this IServiceCollection services, string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> pipelineBuilder)
+    /// <summary>
+    /// Adds a search request to the <paramref name="services"/>.
+    /// </summary>
+    /// <typeparam name="TRequest">Type of request to be handled by the operation.</typeparam>
+    /// <typeparam name="TRequestPipeline">Type of pipeline orchestrating the operation.</typeparam>
+    /// <param name="services"><see cref="IServiceCollection"/> the services are to be registered to.</param>
+    /// <param name="operationKey">Key of the operation.</param>
+    /// <param name="operationBuilder">Builder action for configuring the operation.</param>
+    /// <returns>The <paramref name="services"/> for further configurations.</returns>
+    public static IServiceCollection AddSearchRequestOperation<TRequest, TRequestPipeline>(this IServiceCollection services, string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> operationBuilder)
         where TRequest : class, ISearchRequest
         where TRequestPipeline : class, ISearchRequestPipeline<TRequest>
     {
-        var builder = new SearchOperationConfigurationBuilder<TRequest>(operationKey, typeof(TRequestPipeline));
-        pipelineBuilder.Invoke(builder);
+        return services.AddSearchRequestOperation(typeof(TRequestPipeline), operationKey, operationBuilder);
+    }
+
+    /// <summary>
+    /// Adds a search request to the <paramref name="services"/>.
+    /// </summary>
+    /// <typeparam name="TRequest">Type of request to be handled by the operation.</typeparam>
+    /// <param name="services"><see cref="IServiceCollection"/> the services are to be registered to.</param>
+    /// <param name="pipelineImplemenetationType">Type of pipeline orchestrating the operation.</param>
+    /// <param name="operationKey">Key of the operation.</param>
+    /// <param name="operationBuilder">Builder action for configuring the operation.</param>
+    /// <returns>The <paramref name="services"/> for further configurations.</returns>
+    public static IServiceCollection AddSearchRequestOperation<TRequest>(this IServiceCollection services, Type pipelineImplemenetationType, string operationKey, Action<ISearchOperationConfigurationBuilder<TRequest>> operationBuilder)
+        where TRequest : class, ISearchRequest
+    {
+        var builder = new SearchOperationConfigurationBuilder<TRequest>(operationKey, pipelineImplemenetationType);
+        operationBuilder.Invoke(builder);
         var operationConfiguration = builder.Build();
 
         RegisterPipelineConfiguration(services, operationConfiguration);
