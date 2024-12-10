@@ -29,21 +29,21 @@ public interface IConcurrentSearchOperationCallback
     /// <summary>
     /// Reports back <see cref="ISearchResult"/>s and adds them to the <see cref="IConcurrentSearchResponse"/>.
     /// </summary>
-    /// <param name="handlerMetadata"><see cref="SearchRequestHandlerMetadata"/> of the <see cref="ISearchRequestHandler{TRequest}"/>.</param>
+    /// <param name="handerId">ID of the handler reporting back.</param>
     /// <param name="results">Search results to be added.</param>
     /// <param name="finished">Determines whether to report as finished as well or not. Otherwise <see cref="ReportFinishedAsync(Guid)"/> should be used to report the handler as completed.</param>
-    public Task ReportResultsAsync(SearchRequestHandlerMetadata handlerMetadata, IEnumerable<ISearchResult> results, bool finished = false);
+    public Task ReportResultsAsync(Guid handerId, IEnumerable<ISearchResult> results, bool finished = false);
 
     /// <summary>
     /// Reports back as finished.
     /// </summary>
-    /// <param name="handlerMetadata"><see cref="SearchRequestHandlerMetadata"/> of the <see cref="ISearchRequestHandler{TRequest}"/>.</param>
-    public Task ReportFinishedAsync(SearchRequestHandlerMetadata handlerMetadata);
+    /// <param name="handerId">ID of the handler reporting back.</param>
+    public Task ReportFinishedAsync(Guid handerId);
 
     /// <summary>
     /// Reports back that an error occurred.
     /// </summary>
-    /// <param name="handlerMetadata"><see cref="SearchRequestHandlerMetadata"/> of the <see cref="ISearchRequestHandler{TRequest}"/>.</param>
+    /// <param name="handerId">ID of the handler reporting back.</param>
     /// <param name="exception">Occurred excetion.</param>
-    public Task ReportFailedAsync(SearchRequestHandlerMetadata handlerMetadata, Exception? exception = null);
+    public Task ReportFailedAsync(Guid handerId, Exception? exception = null);
 }

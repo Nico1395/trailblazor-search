@@ -44,40 +44,40 @@ public sealed class ConcurrentSearchOperationCallback(List<Guid> _handlerIds, IC
     }
 
     /// <inheritdoc/>
-    public async Task ReportResultsAsync(SearchRequestHandlerMetadata handlerMetadata, IEnumerable<ISearchResult> results, bool finished = false)
+    public async Task ReportResultsAsync(Guid handerId, IEnumerable<ISearchResult> results, bool finished = false)
     {
         var resultsList = results.ToList();
         _response.AddResults(resultsList);
 
         if (finished)
         {
-            await ReportFinishedAsync(handlerMetadata);
-            _loggingHandler.LogReportResults(handlerMetadata, resultsList);
+            await ReportFinishedAsync(handerId);
+            _loggingHandler.LogReportResults(handerId, resultsList);
         }
         else
         {
             InvokeOnSearchResultChanged();
-            _loggingHandler.LogReportResults(handlerMetadata, resultsList);
+            _loggingHandler.LogReportResults(handerId, resultsList);
         }
     }
 
     /// <inheritdoc/>
-    public Task ReportFinishedAsync(SearchRequestHandlerMetadata handlerMetadata)
+    public Task ReportFinishedAsync(Guid handerId)
     {
-        _response.State.SetHandlerState(handlerMetadata.HandlerId, SearchRequestHandlerState.Finished);
+        _response.State.SetHandlerState(handerId, SearchRequestHandlerState.Finished);
         InvokeOnSearchResultChanged();
 
-        _loggingHandler.LogReportFinished(handlerMetadata);
+        _loggingHandler.LogReportFinished(handerId);
         return Task.CompletedTask;
     }
 
     /// <inheritdoc/>
-    public Task ReportFailedAsync(SearchRequestHandlerMetadata handlerMetadata, Exception? exception = null)
+    public Task ReportFailedAsync(Guid handerId, Exception? exception = null)
     {
-        _response.State.SetHandlerState(handlerMetadata.HandlerId, SearchRequestHandlerState.Failed);
+        _response.State.SetHandlerState(handerId, SearchRequestHandlerState.Failed);
         InvokeOnSearchResultChanged();
 
-        _loggingHandler.LogReportFailed(handlerMetadata, exception);
+        _loggingHandler.LogReportFailed(handerId, exception);
         return Task.CompletedTask;
     }
 

@@ -28,7 +28,7 @@ public class Program
                 p.WithThread(t =>
                 {
                     t.WithHandler<UserSearchRequestHandler>();
-                    t.WithHandler<ProductSearchRequestHandler>();
+                    t.WithHandler<ProductSearchRequestHandler>(1);
                 });
                 p.WithThread(t =>
                 {

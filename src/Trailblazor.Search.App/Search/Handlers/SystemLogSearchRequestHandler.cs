@@ -13,7 +13,7 @@ internal sealed class SystemLogSearchRequestHandler(
         var requestContext = new SearchRequestHandlerContext<SystemLogSearchRequest>()
         {
             Request = SystemLogSearchRequest.Create(context.Request),
-            Metadata = context.Metadata,
+            HandlerConfiguration = context.HandlerConfiguration,
         };
 
         return HandleAsync(requestContext, callback, cancellationToken);
@@ -35,11 +35,11 @@ internal sealed class SystemLogSearchRequestHandler(
             systemLogsQuery = systemLogsQuery.WhereMatchesCriteria(p => p.Created, context.Request.Created);
 
             var searchedSystemLogs = systemLogsQuery.Select(p => new SystemLogSearchResult(p)).ToList();
-            await callback.ReportResultsAsync(context.Metadata, searchedSystemLogs);
+            await callback.ReportResultsAsync(context.HandlerConfiguration.HandlerId, searchedSystemLogs);
         }
         catch (Exception ex)
         {
-            await callback.ReportFailedAsync(context.Metadata, ex);
+            await callback.ReportFailedAsync(context.HandlerConfiguration.HandlerId, ex);
         }
     }
 }

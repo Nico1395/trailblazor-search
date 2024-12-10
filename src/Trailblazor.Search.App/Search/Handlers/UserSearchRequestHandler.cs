@@ -13,7 +13,7 @@ internal sealed class UserSearchRequestHandler(
         var requestContext = new SearchRequestHandlerContext<UserSearchRequest>()
         {
             Request = UserSearchRequest.Create(context.Request),
-            Metadata = context.Metadata,
+            HandlerConfiguration = context.HandlerConfiguration,
         };
 
         return HandleAsync(requestContext, callback, cancellationToken);
@@ -37,11 +37,11 @@ internal sealed class UserSearchRequestHandler(
             usersQuery = usersQuery.WhereMatchesCriteria(p => p.LastChanged, context.Request.LastChanged);
 
             var searchedUsers = usersQuery.Select(p => new UserSearchResult(p)).ToList();
-            await callback.ReportResultsAsync(context.Metadata, searchedUsers);
+            await callback.ReportResultsAsync(context.HandlerConfiguration.HandlerId, searchedUsers);
         }
         catch (Exception ex)
         {
-            await callback.ReportFailedAsync(context.Metadata, ex);
+            await callback.ReportFailedAsync(context.HandlerConfiguration.HandlerId, ex);
         }
     }
 }

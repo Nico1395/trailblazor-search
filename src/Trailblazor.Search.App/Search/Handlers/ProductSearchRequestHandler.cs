@@ -13,7 +13,7 @@ internal sealed class ProductSearchRequestHandler(
         var contextAdapter = new SearchRequestHandlerContext<ProductSearchRequest>()
         {
             Request = ProductSearchRequest.Create(context.Request),
-            Metadata = context.Metadata,
+            HandlerConfiguration = context.HandlerConfiguration,
         };
 
         return HandleAsync(contextAdapter, callback, cancellationToken);
@@ -38,11 +38,11 @@ internal sealed class ProductSearchRequestHandler(
             productsQuery = productsQuery.WhereMatchesCriteria(p => p.LastChanged, context.Request.LastChanged);
 
             var searchedProducts = productsQuery.Select(p => new ProductSearchResult(p)).ToList();
-            await callback.ReportResultsAsync(context.Metadata, searchedProducts);
+            await callback.ReportResultsAsync(context.HandlerConfiguration.HandlerId, searchedProducts);
         }
         catch (Exception ex)
         {
-            await callback.ReportFailedAsync(context.Metadata, ex);
+            await callback.ReportFailedAsync(context.HandlerConfiguration.HandlerId, ex);
         }
     }
 }
