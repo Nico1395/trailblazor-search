@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using Trailblazor.Search.Criteria.Workers;
 using Trailblazor.Search.Logging;
-using Trailblazor.Search.Workers;
 
 namespace Trailblazor.Search.DependencyInjection;
 
@@ -23,7 +23,7 @@ public static class DependencyInjection
 
         services.AddSingleton<ISearchEngineOptionsProvider>(sp => new SearchEngineOptionsProvider(searchEngineOptions));
         services.AddTransient<ICallbackLoggingHandler, CallbackLoggingHandler>();
-        services.AddTransient<ISearchWorker, SearchWorker>();
+        services.AddTransient<IStringSearchCriteriaWorker, StringSearchCriteriaWorker>();
         services.AddTransient<ISearchEngine, SearchEngine>();
 
         foreach (var pipelineConfiguration in searchEngineOptions.OperationConfigurations)

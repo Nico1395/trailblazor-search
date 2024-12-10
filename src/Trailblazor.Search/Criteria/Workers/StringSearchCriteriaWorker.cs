@@ -1,23 +1,20 @@
 ﻿using System.Collections;
 using System.Reflection;
 
-namespace Trailblazor.Search.Workers;
+namespace Trailblazor.Search.Criteria.Workers;
 
-internal sealed class SearchWorker : ISearchWorker
+internal sealed class StringSearchCriteriaWorker : IStringSearchCriteriaWorker
 {
-    public IQueryable<TItem> SearchItems<TItem>(IEnumerable<TItem> items, ISearchWorkerDescriptor descriptor)
+    public IQueryable<TItem> SearchItems<TItem>(IEnumerable<TItem> items, StringSearchCriteria searchCriteria)
     {
-        if (descriptor is not SearchTermSearchWorkerDescriptor searchDescriptor)
+        if (string.IsNullOrWhiteSpace(searchCriteria.Value))
             return items.AsQueryable();
 
-        if (string.IsNullOrWhiteSpace(searchDescriptor.SearchTerm))
-            return items.AsQueryable();
+        var searchTerm = searchCriteria.CaseSensitive == true
+            ? searchCriteria.Value
+            : searchCriteria.Value.ToLowerInvariant();
 
-        var searchTerm = searchDescriptor.CaseSensitive == true
-            ? searchDescriptor.SearchTerm
-            : searchDescriptor.SearchTerm.ToLowerInvariant();
-
-        return items.Where(item => item != null && ItemMatches(item, searchTerm, searchDescriptor.CaseSensitive, searchDescriptor.WholeTerm)).AsQueryable();
+        return items.Where(item => item != null && ItemMatches(item, searchTerm, searchCriteria.CaseSensitive, searchCriteria.WholeTerm)).AsQueryable();
     }
 
     private bool ItemMatches(object item, string searchTerm, bool caseSensitive, bool wholeTerm)
@@ -73,7 +70,7 @@ internal sealed class SearchWorker : ISearchWorker
     private List<PropertyInfo> GetSearchableProperties(Type type)
     {
         return type.GetProperties()
-            .Where(prop => prop.GetCustomAttribute<IncludeOnSearchAttribute>() != null)
+            .Where(prop => prop.GetCustomAttribute<IncludeOnStringSearchAttribute>() != null)
             .ToList();
     }
 }

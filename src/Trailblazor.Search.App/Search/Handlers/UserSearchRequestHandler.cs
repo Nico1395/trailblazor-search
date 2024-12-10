@@ -1,12 +1,12 @@
 ﻿using Trailblazor.Search.App.Persistence;
 using Trailblazor.Search.Criteria.Extensions;
-using Trailblazor.Search.Workers;
+using Trailblazor.Search.Criteria.Workers;
 
 namespace Trailblazor.Search.App.Search.Handlers;
 
 internal sealed class UserSearchRequestHandler(
     IUserRepository _userRepository,
-    ISearchWorker _searchWorker) : ISearchRequestHandler<UniversalSearchRequest>, ISearchRequestHandler<UserSearchRequest>
+    IStringSearchCriteriaWorker _searchWorker) : ISearchRequestHandler<UniversalSearchRequest>, ISearchRequestHandler<UserSearchRequest>
 {
     public Task HandleAsync(SearchRequestHandlerContext<UniversalSearchRequest> context, IConcurrentSearchOperationCallback callback, CancellationToken cancellationToken)
     {
@@ -24,12 +24,7 @@ internal sealed class UserSearchRequestHandler(
         try
         {
             var users = await _userRepository.GetAllAsync(cancellationToken);
-            var usersQuery = _searchWorker.SearchItems(users, new SearchTermSearchWorkerDescriptor()
-            {
-                SearchTerm = context.Request.SearchTerm.Value,
-                WholeTerm = context.Request.SearchTerm.WholeTerm,
-                CaseSensitive = context.Request.SearchTerm.CaseSensitive,
-            });
+            var usersQuery = _searchWorker.SearchItems(users, context.Request.SearchTerm);
 
             usersQuery = usersQuery.WhereMatchesCriteria(p => p.FirstName, context.Request.FirstName);
             usersQuery = usersQuery.WhereMatchesCriteria(p => p.LastName, context.Request.LastName);

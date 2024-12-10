@@ -1,12 +1,12 @@
 ﻿using Trailblazor.Search.App.Persistence;
 using Trailblazor.Search.Criteria.Extensions;
-using Trailblazor.Search.Workers;
+using Trailblazor.Search.Criteria.Workers;
 
 namespace Trailblazor.Search.App.Search.Handlers;
 
 internal sealed class ProductSearchRequestHandler(
     IProductRepository _productRepository,
-    ISearchWorker _searchWorker) : ISearchRequestHandler<UniversalSearchRequest>, ISearchRequestHandler<ProductSearchRequest>
+    IStringSearchCriteriaWorker _searchWorker) : ISearchRequestHandler<UniversalSearchRequest>, ISearchRequestHandler<ProductSearchRequest>
 {
     public Task HandleAsync(SearchRequestHandlerContext<UniversalSearchRequest> context, IConcurrentSearchOperationCallback callback, CancellationToken cancellationToken)
     {
@@ -24,12 +24,7 @@ internal sealed class ProductSearchRequestHandler(
         try
         {
             var products = await _productRepository.GetAllAsync(cancellationToken);
-            var productsQuery = _searchWorker.SearchItems(products, new SearchTermSearchWorkerDescriptor()
-            {
-                SearchTerm = context.Request.SearchTerm.Value,
-                CaseSensitive = context.Request.SearchTerm.CaseSensitive,
-                WholeTerm = context.Request.SearchTerm.WholeTerm,
-            });
+            var productsQuery = _searchWorker.SearchItems(products, context.Request.SearchTerm);
 
             productsQuery = productsQuery.WhereMatchesCriteria(p => p.InStock, context.Request.InStock);
             productsQuery = productsQuery.WhereMatchesCriteria(p => p.InStock, context.Request.InStock);

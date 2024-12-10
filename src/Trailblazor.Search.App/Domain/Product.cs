@@ -1,4 +1,4 @@
-﻿using Trailblazor.Search.Workers;
+﻿using Trailblazor.Search.Criteria.Workers;
 
 namespace Trailblazor.Search.App.Domain;
 
@@ -6,10 +6,10 @@ public class Product
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    [IncludeOnSearch]
+    [IncludeOnStringSearch]
     public string Name { get; set; }
 
-    [IncludeOnSearch]
+    [IncludeOnStringSearch]
     public string Description { get; set; }
 
     public int InStock { get; set; }

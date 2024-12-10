@@ -1,12 +1,12 @@
 ﻿using Trailblazor.Search.App.Persistence;
 using Trailblazor.Search.Criteria.Extensions;
-using Trailblazor.Search.Workers;
+using Trailblazor.Search.Criteria.Workers;
 
 namespace Trailblazor.Search.App.Search.Handlers;
 
 internal sealed class SystemLogSearchRequestHandler(
     ISystemLogRepository _systemLogRepository,
-    ISearchWorker _searchWorker) : ISearchRequestHandler<UniversalSearchRequest>, ISearchRequestHandler<SystemLogSearchRequest>
+    IStringSearchCriteriaWorker _searchWorker) : ISearchRequestHandler<UniversalSearchRequest>, ISearchRequestHandler<SystemLogSearchRequest>
 {
     public Task HandleAsync(SearchRequestHandlerContext<UniversalSearchRequest> context, IConcurrentSearchOperationCallback callback, CancellationToken cancellationToken)
     {
@@ -24,12 +24,7 @@ internal sealed class SystemLogSearchRequestHandler(
         try
         {
             var systemLogs = await _systemLogRepository.GetAllAsync(cancellationToken);
-            var systemLogsQuery = _searchWorker.SearchItems(systemLogs, new SearchTermSearchWorkerDescriptor()
-            {
-                SearchTerm = context.Request.SearchTerm.Value,
-                WholeTerm = context.Request.SearchTerm.WholeTerm,
-                CaseSensitive = context.Request.SearchTerm.CaseSensitive,
-            });
+            var systemLogsQuery = _searchWorker.SearchItems(systemLogs, context.Request.SearchTerm);
 
             systemLogsQuery = systemLogsQuery.WhereMatchesCriteria(p => p.Message, context.Request.Message);
             systemLogsQuery = systemLogsQuery.WhereMatchesCriteria(p => p.Created, context.Request.Created);

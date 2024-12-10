@@ -1,4 +1,4 @@
-﻿using Trailblazor.Search.Workers;
+﻿using Trailblazor.Search.Criteria.Workers;
 
 namespace Trailblazor.Search.App.Domain;
 
@@ -6,7 +6,7 @@ public class SystemLog
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    [IncludeOnSearch]
+    [IncludeOnStringSearch]
     public string Message { get; set; }
 
     public DateTime Created { get; set; }

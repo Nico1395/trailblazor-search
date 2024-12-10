@@ -1,4 +1,4 @@
-﻿using Trailblazor.Search.Workers;
+﻿using Trailblazor.Search.Criteria.Workers;
 
 namespace Trailblazor.Search.App.Domain;
 
@@ -6,10 +6,10 @@ public class User
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    [IncludeOnSearch]
+    [IncludeOnStringSearch]
     public string FirstName { get; set; }
 
-    [IncludeOnSearch]
+    [IncludeOnStringSearch]
     public string LastName { get; set; }
 
     public DateTime Created { get; set; }
