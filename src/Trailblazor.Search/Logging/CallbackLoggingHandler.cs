@@ -6,7 +6,7 @@ namespace Trailblazor.Search.Logging;
 
 internal sealed class CallbackLoggingHandler(
     IServiceProvider _serviceProvider,
-    ISearchEngineOptions _searchEngineOptions) : ICallbackLoggingHandler
+    ISearchEngineOptionsProvider _searchEngineOptionsProvider) : ICallbackLoggingHandler
 {
     private ILogger<CallbackLoggingHandler>? _logger;
     private ILogger<CallbackLoggingHandler>? Logger => _logger ??= _serviceProvider.GetService<ILogger<CallbackLoggingHandler>>();
@@ -61,6 +61,6 @@ internal sealed class CallbackLoggingHandler(
 
     private ISearchRequestHandlerConfiguration GetHandlerConfiguration(Guid handlerId)
     {
-        return _searchEngineOptions.OperationConfigurations.SelectMany(o => o.ThreadConfigurations).SelectMany(o => o.HandlerConfigurations).Single(h => h.HandlerId == handlerId);
+        return _searchEngineOptionsProvider.GetOptions().OperationConfigurations.SelectMany(o => o.ThreadConfigurations).SelectMany(o => o.HandlerConfigurations).Single(h => h.HandlerId == handlerId);
     }
 }
