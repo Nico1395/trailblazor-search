@@ -60,7 +60,7 @@ public sealed class DefaultSearchRequestPipeline<TRequest>(IServiceProvider _ser
 
     private async Task HandleThreadAsync(IConcurrentSearchOperationCallback callback, List<HandlerContextPair> handlerContextPairs, CancellationToken cancellationToken)
     {
-        foreach (var (handler, context) in handlerContextPairs)
+        foreach (var (handler, context) in handlerContextPairs.OrderBy(p => p.Context.HandlerConfiguration.Priority))
             await handler.HandleAsync(context, callback, cancellationToken);
     }
 }
